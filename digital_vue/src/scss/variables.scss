@@ -1,0 +1,52 @@
+$body-font-family: roboto, Courier !important;
+
+@import "~vuetify/src/styles/styles.sass";
+
+// #app,
+// footer {
+//     background-color: var(--v-background-base) !important;
+// }
+
+// .is-loading {
+//     display: inline-block;
+// }
+
+// .is-not-loading {
+//     display: none;
+// }
+
+// .progress-circle {
+//     position: absolute;
+//     left: 0;
+//     right: 0;
+//     margin-left: auto;
+//     margin-right: auto;
+//     margin-top: 4rem;
+//     z-index: 10;
+// }
+
+// .sheet-border {
+//     border: 1px solid var(--v-secondary);
+// }
+
+// .v-data-table-header th {
+//     font-size: medium !important;
+//     font-weight: bold !important;
+//     color: black !important;
+//     font-family: "Roboto", sans-serif !important;
+// }
+
+// .table-totals {
+//     margin-top: 8px !important;
+//     font-size: medium !important;
+//     font-weight: bold !important;
+//     color: black !important;
+//     font-family: "Roboto", sans-serif !important;
+// }
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: inner-spin-button !important;
+    opacity: 1;
+    margin-left: 5px;
+}
