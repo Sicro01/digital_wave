@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-row
-            class="ma-0 white d-flex align-center">
+            class="ma-0 top-row white d-flex align-center">
             <v-col
                 class="ma-0 pa-0 black--text"
                 cols="auto">
@@ -59,34 +59,70 @@
                                 @open-createstrategy-dialog="showNewStrategyDialog = true" />
                         </v-toolbar>
                     </v-col>
-                </v-row>
-
-            </v-col>
-        </v-row>
-
-        <v-divider></v-divider>
-
-        <PhaseCard
-            v-if="showPhase"
-            @hide="showPhase = false"
-            @copy="copyPhase"
-            @update="updatePhase"
-            @delete="deletePhase" />
-        <PhaseNewDialog
-            v-model="showNewPhaseDialog"
-            :phase="newPhaseStrategyData"
-            @create-phase="createPhase" />
-
-        <StrategyCard
-            v-if="showStrategy"
-            @hide="showStrategy = false"
-            @copy="copyStrategy"
-            @update="updateStrategy"
-            @delete="deleteStrategy" />
-        <StrategyNewDialog
-            v-model="showNewStrategyDialog"
-            :strategy="initialStrategy"
-            @create-strategy="createStrategy" />
+                    <v-col cols="auto" class="pa-0">
+                        <v-toolbar dense flat>
+                            <TargetCountryMenu
+                                @open-targetcountry-card='(showTargetCountries = !showTargetCountries)'
+                                @hide="(showTargetCountries = false)" />
+                        </v-toolbar>
+                    </v-col>
+                    <v-col cols="auto" class="pa-0">
+                        <v-toolbar dense flat>
+                            <TargetChannelMenu
+                                @open-targetchannel-card='(showTargetChannels = !showTargetChannels)'
+                                @hide="(showTargetChannels = false)" />
+                        </v-toolbar>
+                    </v-col>
+                    <v-col cols="auto" class="pa-0">
+                        <v-toolbar dense flat>
+                            <TargetDeviceMenu
+                                @open-targetdevice-card='(showTargetDevices = !showTargetDevices)'
+                                @hide="(showTargetDevices = false)" />
+                        </v-toolbar>
+                    </v-col>
+                    </v-row>
+                    
+                    </v-col>
+                    </v-row>
+                    
+                    <v-divider></v-divider>
+                    
+                    <PhaseCard
+                        v-if="showPhase"
+                        @hide="(showPhase = false)"
+                        @copy="copyPhase"
+                        @update="updatePhase"
+                        @delete="deletePhase" />
+                    <PhaseNewDialog
+                        v-model="showNewPhaseDialog"
+                        :phase="newPhaseStrategyData"
+                        @create-phase="createPhase" />
+                    
+                    <StrategyCard
+                        v-if="showStrategy"
+                        @hide="(showStrategy = false)"
+                        @copy="copyStrategy"
+                        @update="updateStrategy"
+                        @delete="deleteStrategy" />
+                    <StrategyNewDialog
+                        v-model="showNewStrategyDialog"
+                        :strategy="initialStrategy"
+                        @create-strategy="createStrategy" />
+                    
+                    <TargetCountryCard
+                        v-if="showTargetCountries"
+                        @hide="(showTargetCountries = false)"
+                        @update-target-countries="updateTargetCountries" />
+                    
+                    <TargetChannelCard
+                        v-if="showTargetChannels"
+                        @hide="(showTargetChannels = false)"
+                        @update-target-channels="updateTargetChannels" />
+                    
+                    <TargetDeviceCard
+                        v-if="showTargetDevices"
+                        @hide="(showTargetDevices = false)"
+                        @update-target-devices="updateTargetDevices" />
 
     </div>
 </template>
@@ -97,6 +133,12 @@ import PhaseNewDialog from '@/components/dialogs/PhaseNewDialog'
 import StrategyMenu from '@/components/strategy/StrategyMenu'
 import StrategyCard from '@/components/strategy/StrategyCard'
 import StrategyNewDialog from '@/components/dialogs/StrategyNewDialog'
+import TargetCountryMenu from '@/components/targetcountry/TargetCountryMenu'
+import TargetCountryCard from '@/components/targetcountry/TargetCountryCard'
+import TargetChannelMenu from '@/components/targetchannel/TargetChannelMenu'
+import TargetChannelCard from '@/components/targetchannel/TargetChannelCard'
+import TargetDeviceMenu from '@/components/targetdevice/TargetDeviceMenu'
+import TargetDeviceCard from '@/components/targetdevice/TargetDeviceCard'
 import axios from 'axios'
 
 export default {
@@ -108,6 +150,12 @@ export default {
         StrategyMenu,
         StrategyCard,
         StrategyNewDialog,
+        TargetCountryMenu,
+        TargetCountryCard,
+        TargetChannelMenu,
+        TargetChannelCard,
+        TargetDeviceMenu,
+        TargetDeviceCard,
     },
     data() {
         return {
@@ -115,6 +163,9 @@ export default {
             showNewPhaseDialog: false,
             showStrategy: false,
             showNewStrategyDialog: false,
+            showTargetCountries: false,
+            showTargetChannels: false,
+            showTargetDevices: false,
             newPhase: {
                 name: '',
                 description: '',
@@ -167,6 +218,21 @@ export default {
                 return this.$store.state.selectedStrategyData.index
             }
         },
+        storedTargetCountries: {
+            get() {
+                return this.$store.state.storedTargetCountries
+            }
+        },
+        storedTargetChannels: {
+            get() {
+                return this.$store.state.storedTargetChannels
+            }
+        },
+        storedTargetDevices: {
+            get() {
+                return this.$store.state.storedTargetDevices
+            }
+        },
         planNumberStrategies: {
             get() {
                 let count = 0;
@@ -175,10 +241,20 @@ export default {
                         count++
                     });
                 })
-                console.log(count)
                 return count;
             }
         },
+        storedCountries: {
+            get() {
+                return this.$store.state.storedCountries
+            }
+        },
+    },
+    async mounted() {
+        document.title = this.selectedPlan.name + ' | Digital Wave'
+        await this.getTargetCountries()
+        await this.getTargetChannels()
+        await this.getTargetDevices()
     },
     methods: {
         openPhaseCard(phase, index) {
@@ -202,7 +278,6 @@ export default {
             this.$store.dispatch('selectStrategyData', strategyDataPayload)
         },
         async getPlan() {
-            console.log('getplan: ', this.selectedPlan)
             var response = ''
             try {
                 response = await axios.get(`/api/v1/plan/${this.selectedPlan.id}`)
@@ -269,6 +344,10 @@ export default {
             const phaseDataPayload = { phase: this.selectedPlan.phases[phaseIndex], index: phaseIndex }
             this.$store.dispatch('selectPhaseData', phaseDataPayload)
 
+            // Refresh Stored Strategy data
+            const strategyDataPayload = { strategy: this.selectedPhase.strategies[0], index: 0 }
+            this.$store.dispatch('selectStrategyData', strategyDataPayload)
+
             // Display Snackbar message
             this.showSnackBar(message, alertType)
         },
@@ -278,7 +357,6 @@ export default {
             this.createStrategy(newStrategy)
         },
         async updateStrategy() {
-            console.log('this.selectedStrategy: ', this.selectedStrategy)
             var response = ''
             try {
                 response = await axios.put(`api/v1/strategy/${this.selectedStrategy.id}/`, this.selectedStrategy)
@@ -303,7 +381,6 @@ export default {
             this.endDBStrategyProcessing(0, `Successfully created Strategy "${response.data.name}"`)
         },
         async deleteStrategy() {
-            console.log('del strat: this.selectedStrategy')
             // A pLan must have at least one Strategy
             if (this.selectedPhase.strategies.length === 1) {
                 // Display Snackbar message
@@ -334,9 +411,187 @@ export default {
 
             // Refresh Stored Strategy data
             const strategyDataPayload = { strategy: this.selectedPhase.strategies[strategyIndex], index: strategyIndex }
-            console.log('endDBStrategyProcessing - strategyDataPayload:', strategyDataPayload)
             this.$store.dispatch('selectStrategyData', strategyDataPayload)
-            console.log('endDBStrategyProcessing - selectedStratgey:', this.selectedStrategy)
+
+            // Display Snackbar message
+            this.showSnackBar(message, alertType)
+        },
+        async getTargetCountries() {
+            var response = ''
+            try {
+                response = await axios.get(`api/v1/targetcountries`, {
+                    params: {
+                        strategy: this.selectedStrategy.id,
+                    }
+                })
+            }
+            catch (error) {
+                console.log(error)
+            }
+            this.$store.dispatch('storeTargetCountries', response.data)
+        },
+        async updateTargetCountries(newCountryObjects, deleteCountryIds) {
+            // Delete and Add target countries rather than faff around and try to add/delete/update them
+            if (deleteCountryIds.length > 0) { await this.deleteTargetCountries(deleteCountryIds) }
+
+            // Update or Create each country selected
+            for (const target_country of newCountryObjects) {
+                var response = ''
+                try {
+                    response = await axios.post(`api/v1/targetcountries/`, target_country)
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }
+            // must await this before adding else get database lock error
+            var message = `Successfully created/updated ${newCountryObjects.length} Target Countries`
+            if (deleteCountryIds.length > 0) { message += ` and deleted ${deleteCountryIds.length}"` }
+            this.endDBTargetCountriesProcessing(message)
+            return response
+        },
+        async deleteTargetCountries(deleteCountryIds) {
+            var params = new URLSearchParams();
+            params.append('strategy', this.selectedStrategy.id);
+            deleteCountryIds.forEach((id) => {
+                params.append('target_country', id);
+            })
+            var request = { params: params }
+            var response = ''
+            try {
+                response = await axios.delete(`api/v1/targetcountries/`, request)
+            }
+            catch (error) {
+                console.log(error)
+            }
+            return response
+        },
+        async endDBTargetCountriesProcessing(message, alertType = 'success') {
+            // Refresh Strategy's Stored Target Country data 
+            await this.getTargetCountries()
+
+            // Display Snackbar message
+            this.showSnackBar(message, alertType)
+        },
+        async getTargetChannels() {
+            var storedTargetChannels = []
+            for (const target_country of this.storedTargetCountries) {
+                var response = ''
+                try {
+                    response = await axios.get(`api/v1/targetchannels`, {
+                        params: {
+                            target_country_id: target_country.id,
+                        }
+                    })
+                }
+                catch (error) {
+                    console.log(error)
+                }
+                if (typeof (response.data) !== 'undefined') {
+                    let target_channels = response.data
+                    target_channels.forEach(tch => storedTargetChannels.push(tch))
+                }
+            }
+            this.$store.dispatch('storeTargetChannels', storedTargetChannels)
+            // console.log('PlanDetailView: getTargetChannels:storedTargetChannels:', this.storedTargetChannels)
+        },
+        async updateTargetChannels(targetChannels, deleteTargetChannelIds) {
+            // Delete and Add target cannels rather than faff around and try to add/delete/update them
+            await this.deleteTargetChannels(deleteTargetChannelIds) // must await this before adding else get database lock error
+            // console.log('targetChannels:', targetChannels)
+            for (const target_channel of targetChannels) {
+                var response = ''
+                try {
+                    response = await axios.post(`api/v1/targetchannels/`, target_channel)
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }
+            this.endDBTargetChannelsProcessing(`Successfully updated ${targetChannels.length} Target Channels"`)
+        },
+        async deleteTargetChannels(deleteTargetChannelIds) {
+            for (const target_channel of deleteTargetChannelIds) {
+                console.log('deleting target_channel:', target_channel)
+                var params = new URLSearchParams();
+                params.append('target_country_id', target_channel.target_country);
+                params.append('target_channel_id', target_channel.channel);
+                var request = { params: params }
+                var response = ''
+                try {
+                    response = await axios.delete(`api/v1/targetchannels/`, request)
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }
+            return response
+        },
+        async endDBTargetChannelsProcessing(message, alertType = 'success') {
+            // Refresh Strategy's Stored Target Channel data 
+            await this.getTargetChannels()
+
+            // Display Snackbar message
+            this.showSnackBar(message, alertType)
+        },
+        async getTargetDevices(){
+            var storedTargetDevices = []
+            // console.log('PlanDetailView: getTargetDevices: storedTargetChannels: ', this.storedTargetChannels)
+            for (const target_channel of this.storedTargetChannels) {
+                var response = ''
+                try {
+                    response = await axios.get(`api/v1/targetdevices`, {
+                        params: {
+                            target_channel_id: target_channel.id,
+                        }
+                    })
+                }
+                catch (error) {
+                    console.log(error)
+                }
+                if (typeof (response.data) !== 'undefined') {
+                    let target_devices = response.data
+                    // console.log('PlanDetailView: getTargetDevices: target_devices: ', target_devices)
+                    target_devices.forEach(tdev => storedTargetDevices.push(tdev))
+                }
+            }
+            // console.log('PlanDetailView: getTargetDevices: storedTargetDevices: ', storedTargetDevices)
+            this.$store.dispatch('storeTargetDevices', storedTargetDevices)
+        },
+        async updateTargetDevices(targetDevices, deleteTargetDeviceIds) {
+            // Delete and Add target cannels rather than faff around and try to add/delete/update them
+            await this.deleteTargetDevices(deleteTargetDeviceIds) // must await this before adding else get database lock error
+            console.log('targetDevices:', targetDevices)
+            for (const target_device of targetDevices) {
+                var response = ''
+                try {
+                    response = await axios.post(`api/v1/targetdevices/`, target_device)
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }
+            this.endDBTargetDevicesProcessing(`Successfully updated ${targetDevices.length} Target Devices"`)
+        },
+        async deleteTargetDevices(deleteTargetDeviceIds) {
+            for (const target_device of deleteTargetDeviceIds) {
+                var params = new URLSearchParams();
+                params.append('target_device_id', target_device.device);
+                params.append('target_channel_id', target_device.target_channel);
+                var request = { params: params }
+                var response = ''
+                try {
+                    response = await axios.delete(`api/v1/targetdevices/`, request)
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }
+            return response
+        },
+        async endDBTargetDevicesProcessing(message, alertType = 'success') {
+            // Refresh Strategy's Stored Target Device data 
+            await this.getTargetDevices()
 
             // Display Snackbar message
             this.showSnackBar(message, alertType)
@@ -348,7 +603,16 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
+table>tbody>tr>td:nth-child(1),
+table>thead>tr>th:nth-child(1) {
+    position: sticky !important;
+    position: -webkit-sticky !important;
+    left: 0;
+    z-index: 9998;
+    background: white;
+}
+
 div.v-toolbar__content {
     padding: 0px;
 }

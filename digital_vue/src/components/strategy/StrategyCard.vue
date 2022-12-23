@@ -11,6 +11,10 @@
                 <v-spacer></v-spacer>
 
                 <CardIcons cardType="Strategy"
+                    :showEditIcon="true"
+                    :showDeleteIcon="true"
+                    :showCopyIcon="true"
+                    :showHideIcon="true"
                     @edit="(locked = !locked)"
                     @delete="confirmDeleteStrategy"
                     @copy="$emit('copy')"
@@ -18,9 +22,13 @@
 
             </v-card-title>
             <v-divider></v-divider>
+            <v-card-text class="pb-0">
+                Phase: {{ this.selectedPhase.name }}&emsp; &emsp;&emsp;Budget: {{ this.selectedPhase.budget }}
+                &emsp; &emsp;&emsp;Auto-Allocate: {{selectedPhase.auto_allocate? 'Yes' : 'No' }}
+            </v-card-text>
             <v-card-text>
                 <v-row>
-                    <v-col md="4" sm="12" class="mt-3 px-2">
+                    <v-col md="4" sm="12" class="px-2">
                         <v-text-field
                             v-model="selectedStrategy.name"
                             class="rounded-0"
@@ -33,7 +41,7 @@
                             outlined>
                         </v-text-field>
                     </v-col>
-                    <v-col md="2" sm="12" class="mt-3 px-2">
+                    <v-col md="2" sm="12" class="px-2">
                         <v-text-field
                             v-model="selectedStrategy.start_date"
                             class="rounded-0"
@@ -48,7 +56,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
-                    <v-col md="2" sm="12" class="mt-3 px-2">
+                    <v-col md="2" sm="12" class="px-2">
                         <v-text-field
                             v-model="selectedStrategy.end_date"
                             class="rounded-0"
@@ -63,7 +71,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
-                    <v-col md="2" sm="12" class="mt-3 px-2">
+                    <v-col md="2" sm="12" class="px-2">
                         <v-text-field
                             v-model.number="selectedStrategy.budget"
                             class="rounded-0"
@@ -76,7 +84,7 @@
                             outlined>
                         </v-text-field>
                     </v-col>
-                    <v-col md="2" sm="12" class="mt-3 px-2">
+                    <v-col md="2" sm="12" class="px-2">
                         <v-checkbox
                             v-model="selectedStrategy.auto_allocate"
                             label="Autoallocate?"
@@ -105,6 +113,7 @@
                         </v-textarea>
                     </v-col>
                 </v-row>
+                
                 <div class="caption">
                     <span>Last edit:{{ new Date(selectedStrategy.date_modified).toLocaleDateString(("en-GB")) }}</span>
                     <span> {{ new Date(selectedStrategy.date_modified).toLocaleTimeString(("en-GB")) }}</span>
@@ -158,9 +167,13 @@ export default {
         }
     },
     computed: {
+        selectedPhase: {
+            get() {
+                return this.$store.state.selectedPhaseData.phase
+            }
+        },
         selectedStrategy: {
             get() {
-                console.log('selectedStrategy:', this.$store.state.selectedStrategyData.strategy)
                 return this.$store.state.selectedStrategyData.strategy
             }
         },

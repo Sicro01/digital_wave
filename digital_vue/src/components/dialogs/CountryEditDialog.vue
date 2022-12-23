@@ -126,20 +126,9 @@ export default {
                 return this.$store.state.storedChannels
             }
         },
-        // Hack to set width of v-dialog
-        width: {
-            get() {
-                switch (this.$vuetify.breakpoint.name) {
-                    case 'xs': return 220
-                    case 'sm': return 600
-                    case 'md': return 800
-                    case 'lg': return 800
-                    case 'xl': return 800
-                }
-            }
-        },
     },
     mounted() {
+        console.log('creating data items for country table')
         this.createDataItems()
     },
     methods: {

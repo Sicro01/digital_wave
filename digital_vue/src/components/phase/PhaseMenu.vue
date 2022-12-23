@@ -6,6 +6,8 @@
                 <v-btn
                     @click="$emit('open-createphase-dialog')"
                     icon
+                    class="ml-2"
+                    small
                     v-bind="attrs"
                     v-on="on">
                     <v-icon

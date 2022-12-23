@@ -32,22 +32,18 @@
                 md="4"
                 sm=12
                 class="px-3 py-0">
-    
                 <PlanCard
                     :plan="plan"
                     @open-dialog="openEditPlanDialog(plan)"
                     @view-details="viewPlanDetails(plan)" />
-    
             </v-col>
         </v-row>
-    
-        <PlanEditDialog
-            v-model="open_dialog"
-            :plan="editPlan"
-            @create-plan="createPlan"
-            @update-plan="updatePlan"
-            @delete-plan="deletePlan" />
-    
+<PlanEditDialog
+    v-model="open_dialog"
+    :plan="editPlan"
+    @create-plan="createPlan"
+    @update-plan="updatePlan"
+    @delete-plan="deletePlan" />
     </div>
 </template>
 <script>
@@ -121,6 +117,21 @@ export default {
                 return this.$store.state.selectedStrategyData.strategy
             }
         },
+        storedTargetCountries: {
+            get() {
+                return this.$store.state.storedTargetCountries
+            }
+        },
+        storedTargetChannels: {
+            get() {
+                return this.$store.state.storedTargetChannels
+            }
+        },
+        storedTargetDevices: {
+            get() {
+                return this.$store.state.storedTargetDevices
+            }
+        },
     },
     mounted() {
         this.getPlans()
@@ -137,7 +148,6 @@ export default {
             }
             if (response.data.length > 0) {
                 this.plans = response.data
-                console.log('plans: ', this.plans)
                 this.$store.dispatch('selectPlan', this.plans[0])
             }
         },
@@ -165,13 +175,11 @@ export default {
             this.$store.dispatch('showSnackBar', payload)
         },
         async createPlan(createPlan) {
-            console.log('createPlan', createPlan)
             // Auto allocate budget 
             var createPlan = this.autoAllocateBudget(createPlan)
 
             // Save plan to DB
             var response = ''
-            console.log('createPlan: ', createPlan)
             try {
                 response = await axios.post(`api/v1/plans/`, createPlan)
             }
@@ -194,6 +202,96 @@ export default {
             const payload = { text: `Successfully deleted ${deletePlan.name}`, alerttype: "success", contentclass: 'white--text' }
             this.$store.dispatch('showSnackBar', payload)
         },
+        async getCountries() {
+            var response = ''
+            try {
+                response = await axios.get(`/api/v1/countries/`)
+            }
+            catch (error) {
+                console.log(error)
+            }
+            this.$store.dispatch('storeCountries', response.data)
+            return response.data
+        },
+        async getChannels() {
+            var response = ''
+            try {
+                response = await axios.get(`/api/v1/channels/`)
+            }
+            catch (error) {
+                console.log(error)
+            }
+            this.$store.dispatch('storeChannels', response.data)
+            return response.data
+        },
+        async getDevices() {
+            var response = ''
+            try {
+                response = await axios.get(`/api/v1/devices/`)
+            }
+            catch (error) {
+                console.log(error)
+            }
+            this.$store.dispatch('storeDevices', response.data)
+            // console.log('HomeView: getDevices: storedDevices:', response.data)
+            return response.data
+        },
+        async getTargetCountries() {
+            var response = ''
+            try {
+                response = await axios.get(`api/v1/targetcountries`, {
+                    params: {
+                        strategy: this.selectedStrategy.id,
+                    }
+                })
+            }
+            catch (error) {
+                console.log(error)
+            }
+            // Refresh Strategy's Stored  Target Country data
+            this.$store.dispatch('storeTargetCountries', response.data)
+            return response.data
+        },
+        async getTargetChannels() {
+            var storedTargetChannels = []
+            this.storedTargetCountries.forEach((country) => {
+                var response = ''
+                try {
+                    response = axios.get(`api/v1/targetchannels`, {
+                        params: {
+                            target_country: country.id,
+                        }
+                    })
+                }
+                catch (error) {
+                    console.log(error)
+                }
+
+                if (typeof (response.data) !== 'undefined')
+                    storedTargetChannels.push(response.data)
+            })
+            this.$store.dispatch('storeTargetChannels', storedTargetChannels)
+        },
+        async getTargetDevices() {
+            var storedTargetDevices = []
+            this.storedTargetChannels.forEach((channel) => {
+                var response = ''
+                try {
+                    response = axios.get(`api/v1/targetchannels`, {
+                        params: {
+                            target_country: channel.id,
+                        }
+                    })
+                }
+                catch (error) {
+                    console.log(error)
+                }
+
+                if (typeof (response.data) !== 'undefined')
+                    storedTargetDevices.push(response.data)
+            })
+            this.$store.dispatch('storeTargetDevices', storedTargetDevices)
+        },
         autoAllocateBudget(plan) {
             if (plan.auto_allocate)
                 console.log('auto allocate budget into phase and strategy')
@@ -204,11 +302,10 @@ export default {
             this.open_dialog = true
         },
         openNewPlanDialog() {
-            console.log('newPlan:', this.newPlan)
             this.editPlan = this.newPlan
             this.open_dialog = true
         },
-        viewPlanDetails(plan) {
+        async viewPlanDetails(plan) {
             // Save the plan to the Store
             this.$store.dispatch('selectPlan', plan)
 
@@ -220,9 +317,12 @@ export default {
             var strategyPayload = { strategy: this.selectedPhase.strategies[0], index: 0 }
             this.$store.dispatch('selectStrategyData', strategyPayload)
 
+            // Get data
+            await this.getCountries()
+            await this.getChannels()
+            await this.getDevices()
+
             // Display the PlanDetailView
-            document.title = this.selectedPlan.name + ' | Digital Wave'
-            // this.$router.push(this.selectedPhase.get_absolute_url)
             this.$router.push('/plan')
         },
     }

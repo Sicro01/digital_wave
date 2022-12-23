@@ -6,6 +6,7 @@
                 <v-btn
                     @click="$emit('open-createstrategy-dialog')"
                     icon
+                    small
                     v-bind="attrs"
                     v-on="on">
                     <v-icon

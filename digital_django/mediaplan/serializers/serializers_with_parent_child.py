@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from ..models import Phase, Strategy, Country
-from .serializers import StrategySerializer, CountrySerializer
+from .serializers import StrategySerializer, CountrySerializer, TargetCountrySerializer
 
 class PhaseSerializerWithParentChild(serializers.ModelSerializer):
     strategies = StrategySerializer(many=True)
@@ -36,7 +36,7 @@ class PhaseSerializerWithParentChild(serializers.ModelSerializer):
         return phase
 
 class StrategySerializerWithParentChild(serializers.ModelSerializer):
-    # countries = CountrySerializer(many=True)
+    targetcountries = TargetCountrySerializer(many=True)
         
     class Meta:
         model = Strategy
@@ -53,16 +53,5 @@ class StrategySerializerWithParentChild(serializers.ModelSerializer):
             "date_added",
             "date_modified",
             "phase",
+            "targetcountries",
         ]
-
-    # def create(self, validated_data):
-    #     country_data = validated_data.pop('countries')
-    #     phase = validated_data.pop('phase')
-    #     strategy = Strategy.objects.create(phase=phase, **validated_data)
-    
-    #     # Add countries for this new Strategy
-    #     for country in country_data:
-    #         countryObj = Country.objects.get(id=country.get('id'))
-    #         strategy.countries.add(countryObj)
-
-    #     return strategy

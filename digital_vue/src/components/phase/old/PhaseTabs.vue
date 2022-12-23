@@ -137,10 +137,10 @@ export default {
 }
 </script>
 <style scoped lang='scss'>
-.v-tab--active {
-    color: white !important;
-    font-weight: bolder;
-}
+// .v-tab--active {
+//     color: white !important;
+//     font-weight: bolder;
+// }
 
 .v-tab {
     text-transform: none !important;

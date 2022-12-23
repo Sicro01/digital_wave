@@ -6,6 +6,9 @@ from mediaplan import views
 app_name='digital_wave_api'
 
 router = DefaultRouter()
+router.register('targetcountries', views.TargetCountryViewSet, basename='targetcountries')
+router.register('targetchannels', views.TargetChannelViewSet, basename='targetchannels')
+router.register('targetdevices', views.TargetDeviceViewSet, basename='targetdevices')
 
 urlpatterns = [
     path('plans/', views.PlanListCreate.as_view(), name='planlist'),
@@ -17,7 +20,7 @@ urlpatterns = [
     path('strategies/', views.StrategyListCreate.as_view(), name='strategylist'),
     path('strategy/<int:pk>/', views.StrategyDetail.as_view(), name='strategydetail'),
 
-    path('countries/', views.CountryListCreate.as_view(), name='countrylist'),
+    path('countries/', views.CountryListCreate.as_view(), name='country'),
     path('country/<int:pk>/', views.CountryDetail.as_view(), name='countrydetail'),
 
     path('channels/', views.ChannelListCreate.as_view(), name='channellist'),
@@ -31,6 +34,6 @@ urlpatterns = [
 
     path('creatives/', views.CreativeListCreate.as_view(), name='creativelist'),
     path('creative/<int:pk>/', views.CreativeDetail.as_view(), name='creativedetail'),
-
-    path('', include(router.urls)),
 ]
+
+urlpatterns += router.urls

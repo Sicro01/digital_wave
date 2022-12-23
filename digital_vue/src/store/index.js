@@ -23,6 +23,7 @@ export default new Vuex.Store({
       planCalendar: false,
       phaseTabs: true,
     },
+    plans: [],
     selectedPlan: '',
     selectedPhaseData: {
       phase: null,
@@ -32,14 +33,21 @@ export default new Vuex.Store({
       strategy: null,
       index: null,
     },
+    storedTargetCountries: [],
+    storedTargetChannels: [],
+    storedTargetDevices: [],
     storedCountries: [],
     storedChannels: [],
+    storedDevices: [],
     axiosState: false,
   },
   getters: {
 
   },
   mutations: {
+    PLANS_ACQUIRED(state, plans) {
+      state.plans = plans
+    },
     PLAN_SELECTED(state, plan) {
       state.selectedPlan = plan
     },
@@ -55,11 +63,41 @@ export default new Vuex.Store({
         state.selectedStrategyData.index = payload.index
       }
     },
+    TARGET_COUNTRIES_STORED(state, targetCountries) {
+      if (typeof (targetCountries) == 'undefined') {
+        targetCountries = []
+      }
+      state.storedTargetCountries = targetCountries
+    },
+    TARGET_CHANNELS_STORED(state, targetChannels) {
+      if (typeof (targetChannels) == 'undefined') {
+        targetChannels = []
+      }
+      state.storedTargetChannels = targetChannels
+    },
+    TARGET_DEVICES_STORED(state, targetDevices) {
+      if (typeof (targetDevices) == 'undefined') {
+        targetDevices = []
+      }
+      state.storedTargetDevices = targetDevices
+    },
     COUNTRIES_STORED(state, countries) {
+      if (typeof (countries) == 'undefined') {
+        countries = []
+      }
       state.storedCountries = countries
     },
     CHANNELS_STORED(state, channels) {
+      if (typeof (channels) == 'undefined') {
+        channels = []
+      }
       state.storedChannels = channels
+    },
+    DEVICES_STORED(state, devices) {
+      if (typeof (devices) == 'undefined') {
+        devices = []
+      }
+      state.storedDevices = devices
     },
     PLAN_CALENDAR_TOGGLED(state) {
       state.show.planCalendar = !state.show.planCalendar
@@ -69,7 +107,6 @@ export default new Vuex.Store({
     },
     STRATEGY_TABS_TOGGLED(state) {
       state.show.strategyTabs = !state.show.strategyTabs
-      console.log('state.show.strategyTabs: ', state.show.strategyTabs)
     },
     SNACKBAR_SHOW(state, payload) {
       let timeout = 300
@@ -86,6 +123,9 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    acquirePlans({ commit }, plans) {
+      commit('PLANS_ACQUIRED', plans)
+    },
     selectPlan({ commit }, plan) {
       commit('PLAN_SELECTED', plan)
     },
@@ -95,11 +135,23 @@ export default new Vuex.Store({
     selectStrategyData({ commit }, payload) {
       commit('STRATEGY_DATA_SELECTED', payload)
     },
+    storeTargetCountries({ commit }, payload) {
+      commit('TARGET_COUNTRIES_STORED', payload)
+    },
+    storeTargetChannels({ commit }, payload) {
+      commit('TARGET_CHANNELS_STORED', payload)
+    },
+    storeTargetDevices({ commit }, payload) {
+      commit('TARGET_DEVICES_STORED', payload)
+    },
     storeCountries({ commit }, payload) {
       commit('COUNTRIES_STORED', payload)
     },
     storeChannels({ commit }, payload) {
       commit('CHANNELS_STORED', payload)
+    },
+    storeDevices({ commit }, payload) {
+      commit('DEVICES_STORED', payload)
     },
     togglePlanCalendar({ commit }) {
       commit('PLAN_CALENDAR_TOGGLED')

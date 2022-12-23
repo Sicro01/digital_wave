@@ -39,24 +39,8 @@ class StrategySerializer(serializers.ModelSerializer):
             "date_added",
             "date_modified",
         ]
-    
-class TargetCountrySerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = TargetCountry
-        fields = [
-            "strategy",
-            "country",
-            "budget",
-            "budget_allocated",
-            "auto_allocate",
-            "date_added",
-            "date_modified",
-            ]
-
 class CountrySerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
+    # id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Country
@@ -66,8 +50,38 @@ class CountrySerializer(serializers.ModelSerializer):
             "name",
         ]
 
+class TargetCountrySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TargetCountry
+        fields = [
+            "id",
+            "strategy",
+            "country",
+            "code",
+            "name",
+            "budget",
+            "budget_allocated",
+            "auto_allocate",
+            "date_added",
+            "date_modified",
+            ]
+        
+    def create(self, validated_data):
+        target_country, created = TargetCountry.objects.update_or_create(
+            strategy=validated_data['strategy'],
+            country=validated_data['country'],
+            defaults={
+                'code': validated_data['code'],
+                'name': validated_data['name'],
+                'budget': validated_data['budget'],
+                'budget_allocated': validated_data['budget_allocated'],
+                'auto_allocate': validated_data['auto_allocate'],
+                })
+        return target_country
+        
 class ChannelSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
+    # id = serializers.IntegerField(required=False)
     
     class Meta:
         model = Channel
@@ -76,6 +90,67 @@ class ChannelSerializer(serializers.ModelSerializer):
             "code",
             "name",
         ]
+class TargetChannelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TargetChannel
+        fields = [
+            "id",
+            "target_country",
+            "channel",
+            "code",
+            "name",
+            "budget",
+            "budget_allocated",
+            "auto_allocate",
+            "date_added",
+            "date_modified",
+            ]
+
+    def create(self, validated_data):
+        print(f'validated_data: {validated_data}')
+        target_channel, created = TargetChannel.objects.update_or_create(
+            target_country=validated_data['target_country'],
+            channel=validated_data['channel'],
+            defaults={
+                'code': validated_data['code'],
+                'name': validated_data['name'],
+                'budget': validated_data['budget'],
+                'budget_allocated': validated_data['budget_allocated'],
+                'auto_allocate': validated_data['auto_allocate'],
+                })
+        return target_channel
+
+class TargetDeviceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TargetDevice
+        fields = [
+            "id",
+            "target_channel",
+            "device",
+            "code",
+            "name",
+            "budget",
+            "budget_allocated",
+            "auto_allocate",
+            "date_added",
+            "date_modified",
+            ]
+
+    def create(self, validated_data):
+        print(f'TargetDeviceSerializer: create: validated_data: {validated_data}')
+        target_device, created = TargetDevice.objects.update_or_create(
+            target_channel=validated_data['target_channel'],
+            device=validated_data['device'],
+            defaults={
+                'code': validated_data['code'],
+                'name': validated_data['name'],
+                'budget': validated_data['budget'],
+                'budget_allocated': validated_data['budget_allocated'],
+                'auto_allocate': validated_data['auto_allocate'],
+                })
+        return target_device
 
 class DeviceSerializer(serializers.ModelSerializer):
 
@@ -83,6 +158,7 @@ class DeviceSerializer(serializers.ModelSerializer):
         model = Device
         fields = [
             "id",
+            "code",
             "name",
         ]
 

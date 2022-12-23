@@ -2,35 +2,42 @@ from rest_framework import serializers
 
 from ..models import Plan, Phase, Strategy, Country, Channel, Device, Ad, Creative
 from .serializers import    (PhaseSerializer, StrategySerializer, CountrySerializer, ChannelSerializer, DeviceSerializer,
-                            AdSerializer, CreativeSerializer)
+                            AdSerializer, CreativeSerializer, TargetCountrySerializer)
 # from .serializers_with_child import PhaseSerializerWithChild
 
-class StrategySerializerWithChild(serializers.ModelSerializer):
+# class StrategySerializerWithChild(serializers.ModelSerializer):
+#     targetcountries = TargetCountrySerializer(many=True)
     
-    class Meta:
-        model = Strategy
-        fields = [
-            "id",
-            "name",
-            "description",
-            "budget",
-            "budget_allocated",
-            "auto_allocate",
-            "date_added",
-            "date_modified",
-        ]
+#     class Meta:
+#         model = Strategy
+#         fields = [
+#              "id",
+#             "name",
+#             "description",
+#             "start_date",
+#             "end_date",
+#             "slug",
+#             "get_absolute_url",
+#             "budget",
+#             "budget_allocated",
+#             "auto_allocate",
+#             "date_added",
+#             "date_modified",
+#         ]
         
-    def update(self, instance, validated_data):
-        # Update and save Strategy
-        instance.name = validated_data.get('name', instance.name)
-        instance.description = validated_data.get('description', instance.description)
-        instance.save()
+#     def update(self, instance, validated_data):
+#         # Update and save Strategy
+#         target_country_data = validated_data.pop('targetcountries')
+#         strategyObj = super().update(instance, validated_data)
+#         strategyObj.save()
+
 
         # Get list of coutries to replac existing list and update this Strategy's countries
-        countries = validated_data.pop('countries', instance.countries)
-        instance.countries.set(countries)
+        # for target_country in target_country_data:
+       
+        
     
-        return instance
+        # return strategyObj
 
 class PhaseSerializerWithChild(serializers.ModelSerializer):
     strategies = StrategySerializer(many=True)

@@ -1,6 +1,17 @@
 <template>
     <div>
-        <v-app-bar app flat tile dark class="primary">
+        <v-app-bar
+            class=""
+            app
+            dark
+            flat
+            tile
+            src="phone.jpg">
+            <template v-slot:img="{ props }">
+                <v-img
+                    v-bind="props"
+                    gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"></v-img>
+            </template>
             <v-app-bar-nav-icon
                 @click="openDrawer"
                 v-click-outside="closeDrawer">
@@ -32,7 +43,6 @@
         </v-app-bar>
     </div>
 </template>
-
 <script>
 export default {
     name: 'AppBar',

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
+import NewHomeView from '@/views/NewHomeView.vue'
 import PlanDetailView from '@/views/PlanDetailView.vue'
 
 Vue.use(VueRouter)
@@ -15,6 +16,11 @@ const routes = [
     path: '/plan',
     name: 'plan',
     component: PlanDetailView
+  },
+  {
+    path: '/newplans',
+    name: 'newplan',
+    component: NewHomeView
   },
   // {
   //   path: '/:phase_slug',

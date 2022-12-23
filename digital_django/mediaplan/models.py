@@ -131,6 +131,8 @@ class Country(models.Model):
 class TargetCountry(models.Model):
     strategy = models.ForeignKey(Strategy, on_delete=models.CASCADE) 
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    code = models.CharField(max_length=5, default=1)
+    name = models.CharField(max_length=100, default='')
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     budget_allocated = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     auto_allocate = models.BooleanField(default=False)
@@ -151,6 +153,8 @@ class Channel(models.Model):
 class TargetChannel(models.Model):
     target_country = models.ForeignKey(TargetCountry, on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    code = models.CharField(max_length=5, default=1)
+    name = models.CharField(max_length=100, default='')
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     budget_allocated = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     auto_allocate = models.BooleanField(default=False)
@@ -158,7 +162,8 @@ class TargetChannel(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
 
 class Device(models.Model):
-    target_channels = models.ManyToManyField(TargetChannel, related_name='TargetDevice', blank=True)
+    target_channels = models.ManyToManyField(TargetChannel, through='TargetDevice', blank=True)
+    code = models.CharField(max_length=5, default='A')
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -170,6 +175,8 @@ class Device(models.Model):
 class TargetDevice(models.Model):
     target_channel = models.ForeignKey(TargetChannel, on_delete=models.CASCADE)
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    code = models.CharField(max_length=5, default=1)
+    name = models.CharField(max_length=100, default='')
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     budget_allocated = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     auto_allocate = models.BooleanField(default=False)

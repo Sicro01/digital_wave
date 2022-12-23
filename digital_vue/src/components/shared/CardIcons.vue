@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-tooltip
+            v-if="showEditIcon"
             bottom>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -18,6 +19,7 @@
         </v-tooltip>
 
         <v-tooltip
+            v-if="showDeleteIcon"
             bottom>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -35,6 +37,7 @@
         </v-tooltip>
 
         <v-tooltip
+            v-if="showCopyIcon"
             bottom>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -52,6 +55,7 @@
         </v-tooltip>
 
         <v-tooltip
+            v-if="showHideIcon"
             bottom>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -73,7 +77,26 @@
 export default {
     name: 'CardIcons',
     props: {
-        cardType: String,
+        cardType: {
+            default: '',
+            type: String
+        },
+        showEditIcon: {
+            default: false,
+            type: Boolean
+        },
+        showDeleteIcon: {
+            default: false,
+            type: Boolean
+        },
+        showCopyIcon: {
+            default: false,
+            type: Boolean
+        },
+        showHideIcon: {
+            default: false,
+            type: Boolean
+        },
     },
 }
 </script>

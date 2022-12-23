@@ -10,16 +10,46 @@
             <v-card-title class="py-0 pl-4 pr-2">Phase
                 <v-spacer></v-spacer>
 
-                <CardIcons cardType="Phase"
-                    @edit="(locked = !locked)"
-                    @delete="confirmDeletePhase"
+                <CardIcons
+                    :showCopyIcon="true"
+                    :showDeleteIcon="true"
+                    :showEditIcon="true"
+                    :showHideIcon="true"
                     @copy="$emit('copy')"
-                    @hide="$emit('hide')" />
-
-            </v-card-title>
-            <v-divider></v-divider>
-            <v-card-text>
-                <v-row>
+                    @delete="confirmDeletePhase"
+                    @edit="(locked = !locked)"
+                    @hide="$emit('hide')"
+                    cardType="Phase" />
+                <!-- {{ this.selectedPlan.budget }}&emsp; &emsp;&emsp;Auto-Allocate: {{selectedPlan.auto_allocate? 'Yes' : 'No' }}} -->
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-card-text class="text--disabled">
+                    <v-row>
+                        <v-col cols="auto" class="py-0 d-flex align-center">Plan Budget:</v-col>
+                        <v-col cols="auto" class="d-flex align-center">
+                            <v-text-field
+                                :value="selectedPlan.budget"
+                                label="Budget"
+                                outlined
+                                dense
+                                disabled
+                                hide-details>
+                            </v-text-field>
+                            <v-col cols="auto" class="py-0 d-flex align-center">
+                                <v-text-field
+                                    :value="selectedPlan.auto_allocate? 'Yes' : 'No'"
+                                    label="Budget Autoallocated?"
+                                    outlined
+                                    dense
+                                    disabled
+                                    hide-details>
+                                </v-text-field>
+                            </v-col>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text class="pt-0">
+                    <v-row>
                     <v-col md="4" sm="12" class="mt-3 px-2">
                         <v-text-field
                             v-model="selectedPhase.name"
@@ -105,7 +135,7 @@
                         </v-textarea>
                     </v-col>
                 </v-row>
-                <div class="caption">
+                <div class="caption text--disabled">
                     <span>Last edit:{{ new Date(selectedPhase.date_modified).toLocaleDateString(("en-GB")) }}</span>
                     <span> {{ new Date(selectedPhase.date_modified).toLocaleTimeString(("en-GB")) }}</span>
                 </div>
@@ -157,9 +187,13 @@ export default {
         }
     },
     computed: {
+        selectedPlan: {
+            get() {
+                return this.$store.state.selectedPlan
+            }
+        },
         selectedPhase: {
             get() {
-                console.log('selectedPhase:', this.$store.state.selectedPhaseData.phase)
                 return this.$store.state.selectedPhaseData.phase
             }
         },
